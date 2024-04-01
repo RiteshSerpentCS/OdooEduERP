@@ -2,7 +2,7 @@
 
 from lxml import etree
 
-from odoo import api, fields, models, _
+from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -27,9 +27,7 @@ class SchoolEvaluation(models.Model):
     student_id = fields.Many2one(
         "student.student", "Student Name", help="Select Student"
     )
-    teacher_id = fields.Many2one(
-        "school.teacher", "Teacher", help="Select teacher"
-    )
+    teacher_id = fields.Many2one("school.teacher", "Teacher", help="Select teacher")
     type = fields.Selection(
         [("student", "Student"), ("faculty", "Faculty")],
         "User Type",
@@ -61,7 +59,6 @@ class SchoolEvaluation(models.Model):
             ("finished", "Finish"),
             ("cancelled", "Cancel"),
         ],
-        "State",
         readonly=True,
         default="draft",
         help="State of evaluation line",
@@ -73,9 +70,7 @@ class SchoolEvaluation(models.Model):
         default=lambda self: self.env.user,
         help="Related user",
     )
-    active = fields.Boolean(
-        "Active", default=True, help="Activate/Deactivate record"
-    )
+    active = fields.Boolean(default=True, help="Activate/Deactivate record")
 
     @api.model
     def default_get(self, fields):
@@ -194,7 +189,7 @@ class StudentEvaluationLine(models.Model):
         domain="[('template_id', '=', stu_eval_id)]",
         help="Evaluation point",
     )
-    rating = fields.Char("Remarks", help="Enter remark")
+    rating = fields.Char(string="Remarks", help="Enter remark")
 
     _sql_constraints = [
         (
@@ -219,7 +214,7 @@ class SchoolEvaluationTemplate(models.Model):
     _description = "School Evaluation Template Details"
     _rec_name = "desc"
 
-    desc = fields.Char("Description", required=True, help="Description")
+    desc = fields.Char(string="Description", required=True, help="Description")
     type = fields.Selection(
         [("faculty", "Faculty"), ("student", "Student")],
         "User Type",
@@ -238,9 +233,7 @@ class RatingRating(models.Model):
     _inherit = "rating.rating"
     _description = "Rating"
 
-    template_id = fields.Many2one(
-        "school.evaluation.template", "Stud", help="Ratings"
-    )
+    template_id = fields.Many2one("school.evaluation.template", "Stud", help="Ratings")
 
     @api.model
     def create(self, vals):
@@ -263,7 +256,17 @@ class RatingRating(models.Model):
             if rate.res_model == "school.evaluation.template":
                 rate.res_name = rate.rating
             else:
-                super(RatingRating, self)._compute_res_name()
+                name = self.env[rate.res_model].sudo().browse(rate.res_id).name_get()
+                rate.res_name = (
+                    name and name[0][1] or ("%s/%s") % (rate.res_model, rate.res_id)
+                )
+
+    @api.constrains("rating", "feedback")
+    def _check_rating_feedback(self):
+        if self.rating == 0 or not self.feedback:
+            raise ValidationError(
+                _("Please provide a rating greater than 0 and add Feedback.")
+            )
 
 
 class StudentExtend(models.Model):
