@@ -16,10 +16,6 @@
                             <h1>HOSTEL Fee Receipt</h1>
                         </div>
                         <table width="100%" style="background: #e6e6e6;">
-                            <t
-                                t-set="account_move_id"
-                                t-value="hostel.env['account.move'].sudo().search([('partner_id','=',hostel.student_id.partner_id.id)])"
-                            />
                             <tr>
                                 <td>
                                     <br />

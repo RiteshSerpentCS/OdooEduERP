@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
       <record id="ir_cron_student_hostel_schedule" model="ir.cron">
             <field name="name">Student Hostel</field>
@@ -7,9 +6,9 @@
             <field name="interval_type">days</field>
             <field name="state">code</field>
             <field name="numbercall">-1</field>
-            <field name="doall" eval="False"/>
-            <field ref="model_hostel_student" name="model_id"/>
-            <field name="active" eval="True"/>
+            <field name="doall" eval="False" />
+            <field ref="model_hostel_student" name="model_id" />
+            <field name="active" eval="True" />
             <field name="code">model.student_expire()</field>
         </record>
 </odoo>
