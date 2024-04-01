@@ -19,7 +19,7 @@ class TimeTable(models.Model):
                 for teacher in rec.timetable_ids
             ]
 
-    name = fields.Char("Description", help="Enter description of timetable")
+    name = fields.Char(string="Description", help="Enter description of timetable")
     standard_id = fields.Many2one(
         "school.standard",
         "Academic Class",
@@ -76,18 +76,17 @@ class TimeTable(models.Model):
                 if len(records) > 1:
                     raise ValidationError(
                         _(
-                            """
-You cannot set lecture at same time %s  at same day %s for teacher %s.!
-"""
+                            f"You cannot set lecture at same time {rec.start_time}"
+                            f"at same day {rec.week_day} for teacher {rec.teacher_id.name}.!"
                         )
-                        % (rec.start_time, rec.week_day, rec.teacher_id.name)
                     )
                 # Checks if time is greater than 24 hours than raise error
                 if rec.start_time > 24 or rec.end_time > 24:
                     raise ValidationError(
                         _(
                             """
-Start and End Time should be less than 24 hours!"""
+                                Start and End Time should be less than 24 hours!
+                            """
                         )
                     )
 
@@ -108,8 +107,10 @@ class TimeTableLine(models.Model):
                 and rec.table_id.timetable_type == "regular"
             ):
                 raise ValidationError(
-                    _("The subject %s is not assigned to teacher %s.")
-                    % (rec.subject_id.name, rec.teacher_id.name)
+                    _(
+                        f"The subject {rec.subject_id.name} is "
+                        f"not assigned to teacher {rec.teacher_id.name}."
+                    )
                 )
 
     teacher_id = fields.Many2one(
@@ -120,12 +121,10 @@ class TimeTableLine(models.Model):
     )
     table_id = fields.Many2one("time.table", "TimeTable")
     start_time = fields.Float(
-        "Start Time",
         required=True,
         help="Time according to timeformat of 24 hours",
     )
     end_time = fields.Float(
-        "End Time",
         required=True,
         help="Time according to timeformat of 24 hours",
     )
@@ -181,9 +180,7 @@ class TimeTableLine(models.Model):
     def check_teacher_room(self):
         """Check available room for teacher."""
         for rec in self:
-            for data in self.env["time.table"].search(
-                [("id", "!=", rec.table_id.id)]
-            ):
+            for data in self.env["time.table"].search([("id", "!=", rec.table_id.id)]):
                 for record in data.timetable_ids:
                     if (
                         data.timetable_type == "regular"
@@ -231,17 +228,16 @@ class SubjectSubject(models.Model):
             access_rights_uid=access_rights_uid,
         )
 
-
     @api.constrains("minimum_marks")
     def _check_negative_marks(self):
         if self.minimum_marks <= 0:
             raise ValidationError(
-                ("The value of minimum marks must be greater than zero")
+                _("The value of minimum marks must be greater than zero")
             )
 
-    @api.constrains("maximum_marks","minimum_marks")
+    @api.constrains("maximum_marks", "minimum_marks")
     def _check_similar_name(self):
         if self.maximum_marks == self.minimum_marks:
             raise ValidationError(
-                ("Maximum marks and Minimum marks should be different, Not same")
-                )
+                _("Maximum marks and Minimum marks should be different, Not same")
+            )
