@@ -41,9 +41,7 @@ class BatchExamReport(models.AbstractModel):
         return stu_list
 
     def daily_attendance(self, form, day, student):
-        attend_month = self.env["student.attendance.by.month"].browse(
-            form.get("id")
-        )
+        attend_month = self.env["student.attendance.by.month"].browse(form.get("id"))
         st_date = attend_month.month.date_start.strftime("%Y-%m-%d")
         #        end_dt = attend_month.month.date_stop
         attend_obj = self.env["daily.attendance"]

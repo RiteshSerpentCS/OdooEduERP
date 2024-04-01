@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
 
         <!-- Form View Of Monthly Attendance Sheet -->
@@ -10,20 +9,29 @@
             <field name="arch" type="xml">
                 <form string="Monthly Attendance Sheet">
                     <sheet>
-                        <separator string="Standard Information" col="2" colspan="2"/>
+                        <separator string="Standard Information" col="2" colspan="2" />
                         <group col="2" colspan="2">
-                            <field name="standard_id"  widget="selection" />
+                            <field name="standard_id" widget="selection" />
                         </group>
                         <separator string="Academic Year Information" colspan="4" />
                         <group col="4" colspan="2">
                             <field name="year_id" widget="selection" />
-                            <field name="month_id" domain="[('year_id','=',year_id)]" widget="selection"/>
+                            <field
+                            name="month_id"
+                            domain="[('year_id','=',year_id)]"
+                            widget="selection"
+                        />
                         </group>
                         <separator string="" colspan="4" />
                     </sheet>
                     <footer>
                         <group colspan="1">
-                            <button class="oe_highlight" string="Open Attendance Sheet" name="monthly_attendance_sheet_open_window" type="object" />
+                            <button
+                            class="oe_highlight"
+                            string="Open Attendance Sheet"
+                            name="monthly_attendance_sheet_open_window"
+                            type="object"
+                        />
                             <button class="oe_link" special="cancel" string="Cancel" />
                         </group>
                     </footer>
