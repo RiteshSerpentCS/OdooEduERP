@@ -15,9 +15,7 @@ class ReportStudentFeesRegister(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         student_payslip = []
         # Inherited method to get report data
-        students_rec = self.env["student.fees.register"].search(
-            [("id", "in", docids)]
-        )
+        students_rec = self.env["student.fees.register"].search([("id", "in", docids)])
         fees_report = self.env["ir.actions.report"]._get_report_from_name(
             "school_fees.student_fees_register"
         )
