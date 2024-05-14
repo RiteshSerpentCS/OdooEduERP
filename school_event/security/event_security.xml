@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='utf-8' ?>
 <odoo>
         <record id="student_rule_event_regi_record" model="ir.rule">
             <field name="name">Personal Event REgistation Record</field>
@@ -14,7 +14,9 @@
             <field name="name">Parents Registration record rule</field>
             <field name="model_id" ref="event.model_event_registration" />
             <field eval="True" name="global" />
-            <field name="domain_force">[('part_name_id.parent_id.partner_id','=',user.partner_id.id)]</field>
+            <field
+            name="domain_force"
+        >[('part_name_id.parent_id.partner_id','=',user.partner_id.id)]</field>
             <field eval="[(4, ref('school.group_school_parent'))]" name="groups" />
         </record>
 
@@ -24,7 +26,9 @@
             <field name="name">Personal Event Record</field>
             <field name="model_id" ref="event.model_event_event" />
             <field eval="1" name="global" />
-            <field name="domain_force">[('part_standard_ids.student_ids.user_id.id','=',user.id)]</field>
+            <field
+            name="domain_force"
+        >[('part_standard_ids.student_ids.user_id.id','=',user.id)]</field>
             <field eval="[(4, ref('school.group_school_student'))]" name="groups" />
         </record>
 
@@ -34,7 +38,9 @@
             <field name="name">Parent can see own child event rcord</field>
             <field name="model_id" ref="event.model_event_event" />
             <field eval="1" name="global" />
-            <field name="domain_force">[('part_standard_ids.student_ids.parent_id.partner_id','=',user.partner_id.id)]</field>
+            <field
+            name="domain_force"
+        >[('part_standard_ids.student_ids.parent_id.partner_id','=',user.partner_id.id)]</field>
             <field eval="[(4, ref('school.group_school_parent'))]" name="groups" />
         </record>
 
@@ -61,7 +67,9 @@
         <!-- Students can see own calendar event -->
 
         <record id="students_grp_event_calendar_record_rule" model="ir.rule">
-            <field name="name">Children can see own record rule of calendar event</field>
+            <field
+            name="name"
+        >Children can see own record rule of calendar event</field>
             <field name="model_id" ref="calendar.model_calendar_event" />
             <field eval="1" name="global" />
             <field name="domain_force">[('partner_ids','=',user.partner_id.id)]</field>
@@ -72,7 +80,9 @@
             <field name="name">Teacher Event Registration Record Rule</field>
             <field name="model_id" ref="event.model_event_registration" />
             <field eval="True" name="global" />
-            <field name="domain_force">[('part_name_id.cmp_id','=',user.company_id.id)]</field>
+        <!--     <field
+            name="domain_force"
+        >[('part_name_id.cmp_id','=',user.company_id.id)]</field> -->
             <field eval="[(4, ref('school.group_school_teacher'))]" name="groups" />
         </record>
 </odoo>
