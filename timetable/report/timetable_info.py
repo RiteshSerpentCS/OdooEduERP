@@ -62,18 +62,13 @@ class ReportTimetableInfo(models.AbstractModel):
         time_data = self._cr.dictfetchall()
         for time_detail in time_data:
             for data in res:
-                if (
-                    time_detail.get("start_time") == data.get("start_time")
-                ) and (time_detail.get("end_time") == data.get("end_time")):
+                if (time_detail.get("start_time") == data.get("start_time")) and (
+                    time_detail.get("end_time") == data.get("end_time")
+                ):
                     if data.get("name") == "Recess":
                         time_detail[data["week_day"]] = data.get("name")
                     else:
-                        td = (
-                            data.get("name")
-                            + "\n("
-                            + data.get("teacher")
-                            + ")"
-                        )
+                        td = data.get("name") + "\n(" + data.get("teacher") + ")"
                         time_detail[data["week_day"]] = td
             timetable_detail.append(time_detail)
         return timetable_detail
