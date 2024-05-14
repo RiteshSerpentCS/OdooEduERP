@@ -7,7 +7,7 @@ from odoo import api, fields, models
 class TerminateReasonHostel(models.TransientModel):
     _inherit = "terminate.reason"
 
-    hostel_info = fields.Text("Hostel Info", help="Hostel information")
+    hostel_info = fields.Text(help="Hostel information")
 
     @api.model
     def default_get(self, fields):

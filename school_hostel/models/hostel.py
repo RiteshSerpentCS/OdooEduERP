@@ -1,5 +1,6 @@
 # See LICENSE file for full copyright and licensing details.
 
+import re
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta as rd
@@ -7,12 +8,16 @@ from dateutil.relativedelta import relativedelta as rd
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
-import re
 
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+    is_driver = fields.Boolean(
+        "Vehicle Driver",
+        help="""Activate if the
+        following person is driver""",
+    )
     is_hostel_rector = fields.Boolean(
         "Hostel Rector",
         help="Activate if the following person is hostel rector",
@@ -23,14 +28,14 @@ class ResPartner(models.Model):
         for rec in self:
             if rec.email:
                 if not re.match(r"[^@]+@[^@]+\.[^@]+", rec.email):
-                    raise ValidationError("Please enter a valid email address.")
+                    raise ValidationError(_("Please enter a valid email address."))
 
 
 class HostelType(models.Model):
     _name = "hostel.type"
     _description = "Information of type of Hostel"
 
-    name = fields.Char("HOSTEL Name", required=True, help="Name of Hostel")
+    name = fields.Char(string="HOSTEL Name", required=True, help="Name of Hostel")
     type = fields.Selection(
         [("male", "Boys"), ("female", "Girls"), ("common", "Common")],
         "HOSTEL Type",
@@ -39,13 +44,10 @@ class HostelType(models.Model):
         default="common",
     )
     other_info = fields.Text("Other Information", help="Enter more information")
-    rector = fields.Many2one("res.partner", "Rector", help="Select hostel rector")
+    rector = fields.Many2one("res.partner", help="Select hostel rector")
     room_ids = fields.One2many("hostel.room", "name", "Room", help="Enter hostel rooms")
     student_ids = fields.One2many(
-        "hostel.student",
-        "hostel_info_id",
-        string="Students",
-        help="Enter students",
+        "hostel.student", "hostel_info_id", string="Students", help="Enter students"
     )
 
     @api.model
@@ -106,14 +108,11 @@ class HostelRoom(models.Model):
 
     name = fields.Many2one("hostel.type", "HOSTEL", help="Name of hostel")
     floor_no = fields.Integer("Floor No.", default=1, help="Floor Number")
-    room_no = fields.Char("Room No.", required=True)
-    student_per_room = fields.Integer(
-        "Student Per Room", required=True, help="Students allocated per room"
-    )
+    room_no = fields.Char(string="Room No.", required=True)
+    student_per_room = fields.Integer(required=True, help="Students allocated per room")
     availability = fields.Float(
         compute="_compute_check_availability",
         store=True,
-        string="Availability",
         help="Room availability in hostel",
     )
     rent_amount = fields.Float(
@@ -206,24 +205,19 @@ class HostelStudent(models.Model):
         help="Rent of room",
     )
     admission_date = fields.Datetime(
-        "Admission Date",
         help="Date of admission in hostel",
         default=fields.Datetime.now,
     )
-    discharge_date = fields.Datetime(
-        "Discharge Date", help="Date on which student discharge"
-    )
-    paid_amount = fields.Float("Paid Amount", help="Amount Paid")
+    discharge_date = fields.Datetime(help="Date on which student discharge")
+    paid_amount = fields.Float(help="Amount Paid")
     hostel_info_id = fields.Many2one("hostel.type", "Hostel", help="Select hostel type")
     room_id = fields.Many2one("hostel.room", "Room", help="Select hostel room")
-    duration = fields.Integer("Duration", help="Enter duration of living")
+    duration = fields.Integer(help="Enter duration of living")
     rent_pay = fields.Float("Rent", help="Enter rent pay of the hostel")
     acutal_discharge_date = fields.Datetime(
         "Actual Discharge Date", help="Date on which student discharge"
     )
-    remaining_amount = fields.Float(
-        compute="_compute_remaining_fee_amt", string="Remaining Amount"
-    )
+    remaining_amount = fields.Float(compute="_compute_remaining_fee_amt")
     status = fields.Selection(
         [
             ("draft", "Draft"),
@@ -233,16 +227,13 @@ class HostelStudent(models.Model):
             ("discharge", "Discharge"),
             ("cancel", "Cancel"),
         ],
-        string="Status",
         copy=False,
         default="draft",
         help="State of the student hostel",
     )
-    hostel_types = fields.Char("Type", help="Enter hostel type")
-    stud_gender = fields.Char("Gender", help="Student gender")
-    active = fields.Boolean(
-        "Active", default=True, help="Activate/Deactivate hostel record"
-    )
+    hostel_types = fields.Char(string="Type", help="Enter hostel type")
+    stud_gender = fields.Char(string="Gender", help="Student gender")
+    active = fields.Boolean(default=True, help="Activate/Deactivate hostel record")
 
     _sql_constraints = [
         (
@@ -431,10 +422,10 @@ class HostelStudent(models.Model):
 
 class HostelAmenities(models.Model):
     _name = "hostel.amenities"
+    _description = "Hostel Amenities"
 
-    name = fields.Char("Name", help="Provided Hostel Amenity", required=True)
+    name = fields.Char(help="Provided Hostel Amenity", required=True)
     active = fields.Boolean(
-        "Active",
         help="Activate/Deactivate whether the amenity should be given or not",
     )
 
@@ -445,7 +436,9 @@ class AccountMove(models.Model):
     hostel_student_id = fields.Many2one(
         "hostel.student", string="Hostel Student", help="Select hostel student"
     )
-    hostel_ref = fields.Char("Hostel Fees Reference", help="Hostel Fee Reference")
+    hostel_ref = fields.Char(
+        string="Hostel Fees Reference", help="Hostel Fee Reference"
+    )
 
 
 class AccountPaymentRegister(models.TransientModel):
