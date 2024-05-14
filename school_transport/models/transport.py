@@ -40,8 +40,8 @@ class FleetVehicle(models.Model):
     )
 
     def action_show_participant(self):
-        """ This opens the xml view specified in
-        xml_id for the current vehicle """
+        """This opens the xml view specified in
+        xml_id for the current vehicle"""
         self.ensure_one()
         xml_id = self.env.context.get("xml_id")
         if xml_id:
@@ -72,21 +72,21 @@ class FleetVehicle(models.Model):
         if self._context.get("name"):
             student_obj = self.env["student.transport"]
             student_rec = student_obj.browse(self._context.get("name"))
-            args += [('id', 'in', student_rec.sudo().trans_vehicle_ids.ids)]
+            args += [("id", "in", student_rec.sudo().trans_vehicle_ids.ids)]
         return super(FleetVehicle, self)._search(
             args,
             offset=offset,
             limit=limit,
             order=order,
             count=count,
-            access_rights_uid=access_rights_uid
+            access_rights_uid=access_rights_uid,
         )
 
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    licence_no = fields.Char("License No", help="Enter License No.")
+    licence_no = fields.Char(string="License No", help="Enter License No.")
 
     @api.constrains("licence_no")
     def check_licence_number(self):
@@ -117,7 +117,7 @@ class TransportParticipant(models.Model):
         required=True,
         help="Select student as transport participant",
     )
-    amount = fields.Float("Amount", readonly=True, help="Enter amount")
+    amount = fields.Float(readonly=True, help="Enter amount")
     transport_id = fields.Many2one(
         "student.transport",
         "Transport Root",
@@ -133,23 +133,17 @@ class TransportParticipant(models.Model):
     tr_reg_date = fields.Date(
         "Transportation Registration Date", help="Start date of registration"
     )
-    tr_end_date = fields.Date(
-        "Registration End Date", help="End date of registration"
-    )
-    months = fields.Integer(
-        "Registration For Months", help="Registration for months"
-    )
+    tr_end_date = fields.Date("Registration End Date", help="End date of registration")
+    months = fields.Integer("Registration For Months", help="Registration for months")
     vehicle_id = fields.Many2one(
         "fleet.vehicle", "Vehicle No", help="Enter vehicle no."
     )
     state = fields.Selection(
         [("running", "Running"), ("over", "Over")],
-        "State",
         readonly=True,
         help="State of the transport participant",
     )
     active = fields.Boolean(
-        "Active",
         default=True,
         help="Marked transport participant as active/deactive",
     )
@@ -195,9 +189,7 @@ class TransportParticipant(models.Model):
         """Inherited method to check state at record deletion"""
         for rec in self:
             if rec.state == "running":
-                raise ValidationError(
-                    _("You cannot delete record in running state!.")
-                )
+                raise ValidationError(_("You cannot delete record in running state!."))
         return super(TransportParticipant, self).unlink()
 
 
@@ -218,13 +210,11 @@ class StudentTransports(models.Model):
         required=True,
         help="Enter Transport Route Name",
     )
-    start_date = fields.Date(
-        "Start Date", required=True, help="Enter start date"
-    )
+    start_date = fields.Date(required=True, help="Enter start date")
     contact_per_id = fields.Many2one(
         "res.partner", "Contact Person", help="Contact Person"
     )
-    end_date = fields.Date("End Date", required=True, help="Enter end date")
+    end_date = fields.Date(required=True, help="Enter end date")
     total_participantes = fields.Integer(
         compute="_compute_total_participants",
         string="Total Participants",
@@ -250,7 +240,6 @@ class StudentTransports(models.Model):
     )
     state = fields.Selection(
         [("draft", "Draft"), ("open", "Open"), ("close", "Close")],
-        "State",
         readonly=True,
         default="draft",
         help="State of student transport",
@@ -284,9 +273,7 @@ class StudentTransports(models.Model):
         for rec in self:
             delta = rec.end_date - rec.start_date
             if rec.start_date > rec.end_date:
-                raise ValidationError(
-                    _("Start date should be less than end date!")
-                )
+                raise ValidationError(_("Start date should be less than end date!"))
             if delta.days < 30:
                 raise ValidationError(_("Enter duration of month!"))
 
@@ -295,9 +282,7 @@ class StudentTransports(models.Model):
         for rec in self:
             if rec.state == "open":
                 raise ValidationError(
-                    _(
-                        "You can delete record in draft state or cancel state only!"
-                    )
+                    _("You can delete record in draft state or cancel state only!")
                 )
         return super(StudentTransports, self).unlink()
 
@@ -323,12 +308,8 @@ class StudentStudent(models.Model):
         trans_student_obj = self.env["transport.participant"]
         trans_regi_obj = self.env["transport.registration"]
         for rec in self:
-            trans_student_rec = trans_student_obj.search(
-                [("name", "=", rec.id)]
-            )
-            trans_regi_rec = trans_regi_obj.search(
-                [("student_id", "=", rec.id)]
-            )
+            trans_student_rec = trans_student_obj.search([("name", "=", rec.id)])
+            trans_regi_rec = trans_regi_obj.search([("student_id", "=", rec.id)])
             if trans_regi_rec:
                 trans_regi_rec.state = "cancel"
             if trans_student_rec:
@@ -389,7 +370,6 @@ class TransportRegistration(models.Model):
             ("paid", "Paid"),
             ("cancel", "Cancel"),
         ],
-        "State",
         readonly=True,
         default="draft",
         help="State of the transport registration form",
@@ -400,14 +380,11 @@ class TransportRegistration(models.Model):
         required=True,
         help="Enter transport vehicle",
     )
-    monthly_amount = fields.Float(
-        "Monthly Amount", help="Enter monthly amount"
-    )
-    paid_amount = fields.Float("Paid Amount", help="Amount Paid")
+    monthly_amount = fields.Float(help="Enter monthly amount")
+    paid_amount = fields.Float(help="Amount Paid")
     remain_amt = fields.Float("Due Amount", help="Amount Remaining")
     transport_fees = fields.Float(
         compute="_compute_transport_fees",
-        string="Transport Fees",
         help="Transport fees",
     )
     amount = fields.Float("Final Amount", readonly=True, help="Final amount")
@@ -423,8 +400,8 @@ class TransportRegistration(models.Model):
     @api.onchange("name")
     def onchange_name(self):
         """
-            This onchange will take amount from student.transport and
-            set monthly amount
+        This onchange will take amount from student.transport and
+        set monthly amount
         """
         self.monthly_amount = 0.0
         self.vehicle_id = False
@@ -495,18 +472,12 @@ class TransportRegistration(models.Model):
         """Method to view invoice of participant."""
         invoice_obj = self.env["account.move"]
         for rec in self:
-            invoices = invoice_obj.search(
-                [("transport_student_id", "=", rec.id)]
-            )
-            action = rec.env.ref(
-                "account.action_move_out_invoice_type"
-            ).read()[0]
+            invoices = invoice_obj.search([("transport_student_id", "=", rec.id)])
+            action = rec.env.ref("account.action_move_out_invoice_type").read()[0]
             if len(invoices) > 1:
                 action["domain"] = [("id", "in", invoices.ids)]
             elif len(invoices) == 1:
-                action["views"] = [
-                    (rec.env.ref("account.view_move_form").id, "form")
-                ]
+                action["views"] = [(rec.env.ref("account.view_move_form").id, "form")]
                 action["res_id"] = invoices.ids[0]
             else:
                 action = {"type": "ir.actions.act_window_close"}
@@ -524,9 +495,7 @@ class TransportRegistration(models.Model):
     def onchange_registration_month(self):
         """Method to compute registration end date."""
         tr_start_date = fields.Date.today()
-        tr_end_date = tr_start_date + relativedelta(
-            months=self.registration_month
-        )
+        tr_end_date = tr_start_date + relativedelta(months=self.registration_month)
         self.reg_end_date = tr_end_date
 
     def trans_regi_cancel(self):
@@ -557,9 +526,7 @@ Registration months must be 1 or more then one month!"""
             # calculate amount and Registration End date
             tr_start_date = rec.reg_date
             ed_date = rec.name.end_date
-            tr_end_date = tr_start_date + relativedelta(
-                months=rec.registration_month
-            )
+            tr_end_date = tr_start_date + relativedelta(months=rec.registration_month)
             if tr_end_date > ed_date:
                 raise UserError(
                     _(
@@ -596,9 +563,7 @@ Registration months must be 1 or more then one month!"""
                 transport_list.append(root.id)
             transport_list.append(temp.id)
             student_rec = prt_obj.browse(rec.student_id.id)
-            student_rec.sudo().write(
-                {"transport_ids": [(6, 0, transport_list)]}
-            )
+            student_rec.sudo().write({"transport_ids": [(6, 0, transport_list)]})
             # make entry in transport.
             trans_participants_list = []
             for prt in rec.name.trans_participants_ids:
@@ -625,7 +590,7 @@ class AccountPaymentRegister(models.TransientModel):
 
     def action_create_payments(self):
         """
-            Override method to write paid amount in hostel student
+        Override method to write paid amount in hostel student
         """
         res = super(AccountPaymentRegister, self).action_create_payments()
         invoice = False
@@ -635,13 +600,8 @@ class AccountPaymentRegister(models.TransientModel):
                     self._context.get("active_ids", [])
                 )
             vals = {}
-            if (
-                invoice.transport_student_id
-                and invoice.payment_state == "paid"
-            ):
-                fees_payment = (
-                    invoice.transport_student_id.paid_amount + rec.amount
-                )
+            if invoice.transport_student_id and invoice.payment_state == "paid":
+                fees_payment = invoice.transport_student_id.paid_amount + rec.amount
                 vals.update(
                     {
                         "state": "paid",
@@ -649,13 +609,8 @@ class AccountPaymentRegister(models.TransientModel):
                         "remain_amt": 0.0,
                     }
                 )
-            elif (
-                invoice.transport_student_id
-                and invoice.payment_state == "not_paid"
-            ):
-                fees_payment = (
-                    invoice.transport_student_id.paid_amount + rec.amount
-                )
+            elif invoice.transport_student_id and invoice.payment_state == "not_paid":
+                fees_payment = invoice.transport_student_id.paid_amount + rec.amount
                 vals.update(
                     {
                         "state": "pending",
