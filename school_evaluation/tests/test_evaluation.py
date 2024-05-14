@@ -90,4 +90,6 @@ class TestEvaluation(common.TransactionCase):
 
     def test_evaluation(self):
         self.assertEqual(self.student.state, "done")
-        self.assertEqual(self.rating_student.res_id, self.evaluation_template_student.id)
+        self.assertEqual(
+            self.rating_student.res_id, self.evaluation_template_student.id
+        )
