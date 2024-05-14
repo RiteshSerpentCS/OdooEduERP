@@ -20,9 +20,7 @@ class StudentAttendanceByMonth(models.TransientModel):
     def default_get(self, fields):
         """Overriding DefaultGet."""
         res = super(StudentAttendanceByMonth, self).default_get(fields)
-        students = self.env["student.student"].browse(
-            self._context.get("active_id")
-        )
+        students = self.env["student.student"].browse(self._context.get("active_id"))
         if students.state == "draft":
             raise ValidationError(
                 _(
@@ -33,7 +31,7 @@ unconfirm state!"""
         return res
 
     def print_report(self):
-        """ This method prints report
+        """This method prints report
         @param self : Object Pointer
         @param cr : Database Cursor
         @param uid : Current Logged in User
@@ -71,6 +69,6 @@ unconfirm state!"""
             "type": "ir.actions.report.xml",
             "form": data,
         }
-        return self.env.ref(
-            "school_attendance.attendace_month_report"
-        ).report_action([], data=datas)
+        return self.env.ref("school_attendance.attendace_month_report").report_action(
+            [], data=datas
+        )

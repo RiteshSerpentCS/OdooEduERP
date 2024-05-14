@@ -64,7 +64,7 @@ class ReportMonthAttendace(models.AbstractModel):
                 state = 'validate' and
                 standard_id = %s and
                 date >= %s and
-                date <= %s 
+                date <= %s
                 {elective_subject} ORDER BY user_id,date
                 """,
             (rec.course_id.id, start_date_str, end_date_str),
@@ -139,29 +139,22 @@ class ReportMonthAttendace(models.AbstractModel):
                         if line and line[0]:
                             lines.append(line[0])
                     matched_dates = []
-                    for student in self.env["daily.attendance.line"].browse(
-                        lines
-                    ):
+                    for student in self.env["daily.attendance.line"].browse(lines):
                         for att_count in range(1, days_of_month + 1):
                             if day_date == att_count:
                                 status = "A"
                                 if student.is_present:
                                     status = no_of_class
-                                    if (
-                                        day_date in matched_dates
-                                        or not matched_dates
-                                    ):
+                                    if day_date in matched_dates or not matched_dates:
                                         if att_data.get(
                                             student.stud_id.name
-                                        ) and att_data.get(
-                                            student.stud_id.name
-                                        ).get(
+                                        ) and att_data.get(student.stud_id.name).get(
                                             att_count
                                         ):
                                             if (
-                                                att_data.get(
-                                                    student.stud_id.name
-                                                ).get(att_count)
+                                                att_data.get(student.stud_id.name).get(
+                                                    att_count
+                                                )
                                                 != "A"
                                             ):
                                                 status = (
@@ -176,15 +169,13 @@ class ReportMonthAttendace(models.AbstractModel):
                                     if day_date in matched_dates:
                                         if att_data.get(
                                             student.stud_id.name
-                                        ) and att_data.get(
-                                            student.stud_id.name
-                                        ).get(
+                                        ) and att_data.get(student.stud_id.name).get(
                                             att_count
                                         ):
                                             if (
-                                                att_data.get(
-                                                    student.stud_id.name
-                                                ).get(att_count)
+                                                att_data.get(student.stud_id.name).get(
+                                                    att_count
+                                                )
                                                 != "A"
                                             ):
                                                 status = int(
@@ -194,11 +185,7 @@ class ReportMonthAttendace(models.AbstractModel):
                                                 )
                                 if not att_data.get(student.stud_id.name):
                                     att_data.update(
-                                        {
-                                            student.stud_id.name: {
-                                                att_count: str(status)
-                                            }
-                                        }
+                                        {student.stud_id.name: {att_count: str(status)}}
                                     )
                                     total_absent = 0
                                     if not student.is_present:
@@ -217,10 +204,7 @@ class ReportMonthAttendace(models.AbstractModel):
                                         {att_count: str(status)}
                                     )
                                     for stu in data:
-                                        if (
-                                            stu.get("name")
-                                            == student.stud_id.name
-                                        ):
+                                        if stu.get("name") == student.stud_id.name:
                                             if not student.is_present:
                                                 stu.update(
                                                     {
@@ -237,11 +221,7 @@ class ReportMonthAttendace(models.AbstractModel):
                                 status = ""
                                 if not att_data.get(student.stud_id.name):
                                     att_data.update(
-                                        {
-                                            student.stud_id.name: {
-                                                att_count: status
-                                            }
-                                        }
+                                        {student.stud_id.name: {att_count: status}}
                                     )
                                     data.append(
                                         {
@@ -259,14 +239,11 @@ class ReportMonthAttendace(models.AbstractModel):
                                         )
                                         == ""
                                     ):
-                                        att_data.get(
-                                            student.stud_id.name
-                                        ).update({att_count: status})
+                                        att_data.get(student.stud_id.name).update(
+                                            {att_count: status}
+                                        )
                                         for stu in data:
-                                            if (
-                                                stu.get("name")
-                                                == student.stud_id.name
-                                            ):
+                                            if stu.get("name") == student.stud_id.name:
                                                 stu.get("att").update(
                                                     {att_count: status}
                                                 )
@@ -285,9 +262,7 @@ class ReportMonthAttendace(models.AbstractModel):
                 {
                     "user": gdata.get("user").name,
                     "school_name": gdata.get("school_name"),
-                    "month": months.get(rec.month)
-                    + "-"
-                    + rec.academic_year_id.code,
+                    "month": months.get(rec.month) + "-" + rec.academic_year_id.code,
                     "batch": rec.course_id.name,
                     "result_data": result_data,
                     "elective_subject": rec.is_elective_subject,
@@ -302,10 +277,7 @@ class ReportMonthAttendace(models.AbstractModel):
             int(rec.academic_year_id.code), int(rec.month)
         )[1]
         start_date_str = (
-            str(int(rec.academic_year_id.code))
-            + "-"
-            + str(int(rec.month))
-            + "-01"
+            str(int(rec.academic_year_id.code)) + "-" + str(int(rec.month)) + "-01"
         )
         end_date_str = (
             str(int(rec.academic_year_id.code))

@@ -4,16 +4,18 @@
 import base64
 import calendar
 import io
+import logging
 from datetime import date, datetime, timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
+_logger = logging.getLogger(__name__)
 try:
     import xlsxwriter
-except:
-    pass
+except ImportError:
+    xlsxwriter = None
 
 
 class DailyAttendanceStudentRemark(models.TransientModel):
@@ -27,16 +29,12 @@ class DailyAttendanceStudentRemark(models.TransientModel):
         "academic.year",
         ondelete="restrict",
         string="Academic Session",
-        default=lambda obj: obj.env["academic.year"].search(
-            [("current", "=", True)]
-        ),
+        default=lambda obj: obj.env["academic.year"].search([("current", "=", True)]),
     )
-    course_id = fields.Many2one(
-        "school.standard", "Class", ondelete="restrict"
-    )
-    user_id = fields.Many2one("school.teacher", "Teacher")
+    course_id = fields.Many2one("school.standard", string="Class", ondelete="restrict")
+    user_id = fields.Many2one("school.teacher", string="Teacher")
     month = fields.Selection(
-        [
+        selection=[
             ("1", "January"),
             ("2", "February"),
             ("3", "March"),
@@ -50,20 +48,19 @@ class DailyAttendanceStudentRemark(models.TransientModel):
             ("11", "November"),
             ("12", "December"),
         ],
-        "Month",
     )
-    month_str = fields.Char("Month")
+    month_str = fields.Char(string="Month")
     subject_ids = fields.Many2many(
         "subject.subject",
         "subject_wizard_rel",
         "subject_id",
         "wizard_id",
-        "Subject",
+        string="Subject's",
         ondelete="restrict",
     )
-    subject_id = fields.Many2one("subject.subject", "Subject", help="Subject")
+    subject_id = fields.Many2one("subject.subject", string="Subject", help="Subject")
     is_elective_subject = fields.Boolean(
-        "Is Elective Subject", help="Check this if subject is elective."
+        string="Elective Subject", help="Check this if subject is elective."
     )
 
     @api.onchange("is_elective_subject")
@@ -116,10 +113,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                 int(rec.academic_year_id.code), int(rec.month)
             )[1]
             start_date_str = (
-                str(int(rec.academic_year_id.code))
-                + "-"
-                + str(int(rec.month))
-                + "-01"
+                str(int(rec.academic_year_id.code)) + "-" + str(int(rec.month)) + "-01"
             )
             end_date_str = (
                 str(int(rec.academic_year_id.code))
@@ -130,7 +124,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                 + " 23:00:00"
             )
 
-            elective_subject = f"and is_elective_subject = 'f'"
+            elective_subject = "and is_elective_subject = 'f'"
             if rec.is_elective_subject:
                 elective_subject = f"and subject_id = {rec.subject_id.id}"
 
@@ -144,7 +138,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                     state = 'validate' and
                     standard_id = %s and
                     date >= %s and
-                    date <= %s 
+                    date <= %s
                     {elective_subject} ORDER BY user_id,date
                     """,
                 (rec.course_id.id, start_date_str, end_date_str),
@@ -152,16 +146,12 @@ class DailyAttendanceStudentRemark(models.TransientModel):
             if not self._cr.fetchall():
                 raise ValidationError(_("Data Not Found"))
         if not self.user_id:
-            report_id = self.env.ref(
-                "school_attendance.monthly_attendance_report"
-            )
+            report_id = self.env.ref("school_attendance.monthly_attendance_report")
             return report_id.report_action(self, data=data, config=False)
 
     @api.model
     def _send_monthly_attendance(self):
-        pr_mon = pre_month = (
-            date.today().replace(day=1) - timedelta(days=1)
-        ).month
+        pr_mon = pre_month = (date.today().replace(day=1) - timedelta(days=1)).month
         pr_mon = str(pr_mon)
         for subject in self.env["subject.subject"].search([]):
             for user in subject.teacher_ids:
@@ -174,10 +164,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                     int(academic_year.code), int(pre_month)
                 )[1]
                 start_date_str = (
-                    str(int(academic_year.code))
-                    + "-"
-                    + str(int(pre_month))
-                    + "-01"
+                    str(int(academic_year.code)) + "-" + str(int(pre_month)) + "-01"
                 )
                 end_date_str = (
                     str(int(academic_year.code))
@@ -216,28 +203,19 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                     "school_attendance", "email_template_monthly_attendace"
                 )[1]
                 template_rec = self.env["mail.template"].browse(template_id)
-                template_rec.write(
-                    {"attachment_ids": [(6, 0, [attachment_id.id])]}
-                )
+                template_rec.write({"attachment_ids": [(6, 0, [attachment_id.id])]})
                 template_rec.send_mail(wizard.id, force_send=True)
         return True
 
     def get_total_class(self, rec, teacher, subject):
         # total_class = 0
-        user = self.env["school.teacher"].search(
-            [("name", "=", teacher)], limit=1
-        )
-        subject = self.env["subject.subject"].search(
-            [("id", "=", subject)], limit=1
-        )
+        user = self.env["school.teacher"].search([("name", "=", teacher)], limit=1)
+        subject = self.env["subject.subject"].search([("id", "=", subject)], limit=1)
         last_day_month = calendar.monthrange(
             int(rec.academic_year_id.code), int(rec.month)
         )[1]
         start_date_str = (
-            str(int(rec.academic_year_id.code))
-            + "-"
-            + str(int(rec.month))
-            + "-01"
+            str(int(rec.academic_year_id.code)) + "-" + str(int(rec.month)) + "-01"
         )
         end_date_str = (
             str(int(rec.academic_year_id.code))
@@ -248,7 +226,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
             + " 23:00:00"
         )
 
-        elective_subject = f"and is_elective_subject = 'f'"
+        elective_subject = "and is_elective_subject = 'f'"
         if rec.is_elective_subject:
             elective_subject = f"and subject_id = {rec.subject_id.id}"
 
@@ -263,15 +241,15 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                 standard_id = %s and
                 user_id = %s and
                 date >= %s and
-                date <= %s 
+                date <= %s
                 {elective_subject} ORDER BY user_id,date
                 """,
-                (
-                    rec.course_id.id,
-                    user.id,
-                    start_date_str,
-                    end_date_str,
-                ),
+            (
+                rec.course_id.id,
+                user.id,
+                start_date_str,
+                end_date_str,
+            ),
         )
 
         records = []
@@ -318,10 +296,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                 int(rec.academic_year_id.code), int(rec.month)
             )[1]
             start_date_str = (
-                str(int(rec.academic_year_id.code))
-                + "-"
-                + str(int(rec.month))
-                + "-01"
+                str(int(rec.academic_year_id.code)) + "-" + str(int(rec.month)) + "-01"
             )
             end_date_str = (
                 str(int(rec.academic_year_id.code))
@@ -332,7 +307,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                 + " 23:00:00"
             )
 
-            elective_subject = f"and is_elective_subject = 'f'"
+            elective_subject = "and is_elective_subject = 'f'"
             if rec.is_elective_subject:
                 elective_subject = f"and subject_id = {rec.subject_id.id}"
 
@@ -346,14 +321,14 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                     state = 'validate' and
                     standard_id = %s and
                     date >= %s and
-                    date <= %s 
+                    date <= %s
                     {elective_subject} ORDER BY user_id,date
                     """,
-                    (
-                        rec.course_id.id,
-                        start_date_str,
-                        end_date_str,
-                    ),
+                (
+                    rec.course_id.id,
+                    start_date_str,
+                    end_date_str,
+                ),
             )
             all_att_data = self._cr.fetchall()
             records = []
@@ -364,9 +339,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                     records.append(record[0])
             group_data = []
             for att in self.env["daily.attendance"].browse(records):
-                date = datetime.strptime(
-                    str(att.date), DEFAULT_SERVER_DATETIME_FORMAT
-                )
+                date = datetime.strptime(str(att.date), DEFAULT_SERVER_DATETIME_FORMAT)
                 day_date = date.strftime("%Y-%m-%d")
                 if not group_data:
                     group_data.append(
@@ -421,9 +394,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                             if line and line[0]:
                                 lines.append(line[0])
                         matched_dates = []
-                        for student in self.env[
-                            "daily.attendance.line"
-                        ].browse(lines):
+                        for student in self.env["daily.attendance.line"].browse(lines):
                             for att_count in range(1, days_of_month + 1):
                                 if day_date == att_count:
                                     status = "A"
@@ -489,25 +460,18 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                                             {
                                                 "roll_no": student.stud_id.roll_no,
                                                 "student_code": student.stud_id.student_code,
-                                                "divisions": gdata.get(
-                                                    "divisions"
-                                                ),
+                                                "divisions": gdata.get("divisions"),
                                                 "total_absent": total_absent,
                                                 "name": student.stud_id.name,
-                                                "att": {
-                                                    att_count: str(status)
-                                                },
+                                                "att": {att_count: str(status)},
                                             }
                                         )
                                     else:
-                                        att_data.get(
-                                            student.stud_id.name
-                                        ).update({att_count: str(status)})
+                                        att_data.get(student.stud_id.name).update(
+                                            {att_count: str(status)}
+                                        )
                                         for stu in data:
-                                            if (
-                                                stu.get("name")
-                                                == student.stud_id.name
-                                            ):
+                                            if stu.get("name") == student.stud_id.name:
                                                 if not student.is_present:
                                                     stu.update(
                                                         {
@@ -524,19 +488,13 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                                     status = ""
                                     if not att_data.get(student.stud_id.name):
                                         att_data.update(
-                                            {
-                                                student.stud_id.name: {
-                                                    att_count: status
-                                                }
-                                            }
+                                            {student.stud_id.name: {att_count: status}}
                                         )
                                         data.append(
                                             {
                                                 "roll_no": student.stud_id.roll_no,
                                                 "student_code": student.stud_id.student_code,
-                                                "divisions": gdata.get(
-                                                    "divisions"
-                                                ),
+                                                "divisions": gdata.get("divisions"),
                                                 "total_absent": 0,
                                                 "name": student.stud_id.name,
                                                 "att": {att_count: status},
@@ -544,14 +502,14 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                                         )
                                     else:
                                         if (
-                                            att_data.get(
-                                                student.stud_id.name
-                                            ).get("att_count")
+                                            att_data.get(student.stud_id.name).get(
+                                                "att_count"
+                                            )
                                             == ""
                                         ):
-                                            att_data.get(
-                                                student.stud_id.name
-                                            ).update({att_count: status})
+                                            att_data.get(student.stud_id.name).update(
+                                                {att_count: status}
+                                            )
                                             for stu in data:
                                                 if (
                                                     stu.get("name")
@@ -686,9 +644,7 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                         "Subject:" + str(rec.subject_id.name),
                         head_fmt_left,
                     )
-                sheet.merge_range(
-                    1, 20, 1, 28, "key P=Present, A=Absent", head_fmt
-                )
+                sheet.merge_range(1, 20, 1, 28, "key P=Present, A=Absent", head_fmt)
                 sheet.write(4, 0, "Sn.", head_fmt)
                 sheet.write(4, 1, "Name", head_fmt)
                 sheet.write(4, 2, "Reg. No", head_fmt)
@@ -706,12 +662,8 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                     if line.get("divisions") or data.get("elective"):
                         sheet.write(row, col, count, tbl_data_fmt)
                     else:
-                        sheet.write(
-                            row, col, line.get("student_code"), tbl_data_fmt
-                        )
-                    sheet.write(
-                        row, col + 1, line.get("name"), tbl_data_fmt_left
-                    )
+                        sheet.write(row, col, line.get("student_code"), tbl_data_fmt)
+                    sheet.write(row, col + 1, line.get("name"), tbl_data_fmt_left)
                     sheet.write(
                         row,
                         col + 2,
@@ -723,12 +675,8 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                     for date in month_days:
                         if line.get("att").get(date):
                             if line.get("att").get(date) not in ["A", False]:
-                                present_no = present + int(
-                                    line.get("att").get(date)
-                                )
-                                present = present + int(
-                                    line.get("att").get(date)
-                                )
+                                present_no = present + int(line.get("att").get(date))
+                                present = present + int(line.get("att").get(date))
                             if line.get("att").get(date) == "A":
                                 absent += 1
                                 sheet.write(
@@ -738,12 +686,9 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                                     tbl_data_fmt,
                                 )
                             elif line.get("att").get(date) != "A":
-                                sheet.write(
-                                    row, col, 'P', tbl_data_fmt_p
-                                )
+                                sheet.write(row, col, "P", tbl_data_fmt_p)
                         col += 1
                     sheet.write(row, col, present, tbl_data_fmt_p)
-                    absent_res = absent
                     self._cr.execute(
                         """
                             SELECT
@@ -763,19 +708,11 @@ class DailyAttendanceStudentRemark(models.TransientModel):
                         )[1]
                         if not total_class_att.get("total"):
                             if student[1] == 3:
-                                if present + absent != total_class_att.get(
-                                    "A"
-                                ):
-                                    absent_res = (
-                                        total_class_att.get("A") - present
-                                    )
+                                if present + absent != total_class_att.get("A"):
+                                    total_class_att.get("A") - present
                             elif student[1] == 4:
-                                if present + absent != total_class_att.get(
-                                    "B"
-                                ):
-                                    absent_res = (
-                                        total_class_att.get("B") - present
-                                    )
+                                if present + absent != total_class_att.get("B"):
+                                    total_class_att.get("B") - present
                     if total_class_att.get("A") == 0:
                         sheet.write(
                             row,
@@ -803,8 +740,8 @@ class DailyAttendanceStudentRemark(models.TransientModel):
             if attach_ids:
                 try:
                     attach_ids.unlink()
-                except:
-                    pass
+                finally:
+                    _logger.info(_("not deleted"))
             # Creating Attachment
             doc_id = attch_obj.create(
                 {
