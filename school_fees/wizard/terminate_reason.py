@@ -21,7 +21,8 @@ class TerminateReasonFees(models.TransientModel):
         ):
             raise ValidationError(
                 _(
-                    "You can't terminate student because payment of fees of student is remaining!"
+                    "You can't terminate student because"
+                    "payment of fees of student is remaining!"
                 )
             )
         return super(TerminateReasonFees, self).save_terminate()

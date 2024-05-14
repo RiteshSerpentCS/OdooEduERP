@@ -15,9 +15,7 @@ class ReportStudentPayslip(models.AbstractModel):
     @api.model
     def _get_report_values(self, docids, data=None):
         """Inherited method to get report data"""
-        student_payslip_rec = self.env["student.payslip"].search(
-            [("id", "in", docids)]
-        )
+        student_payslip_rec = self.env["student.payslip"].search([("id", "in", docids)])
         payslip_model = self.env["ir.actions.report"]._get_report_from_name(
             "school_fees.student_payslip"
         )

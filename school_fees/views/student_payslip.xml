@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html>
 <odoo>
-    <template id="student_fees_register">
+    <template id="student_payslip">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-call="web.external_layout">
@@ -9,7 +9,7 @@
                         <div class="oe_structure" />
                         <div class="row" align="center">
                             <span>
-                                <h1 class="text-center">Students Payroll Register</h1>
+                                <h1>Student PaySlip</h1>
                             </span>
                         </div>
                         <div
@@ -67,6 +67,16 @@
                                 </td>
                             </tr>
                         </table>
+                        <div
+                            class="row"
+                            align="center"
+                            style="font-family: 'Helvetica';font-size: 18px;"
+                        >
+                            <span>
+                                <b>PaySlip of </b>
+                                <b t-field="o.sudo().student_id.name" />
+                            </span>
+                        </div>
                         <br />
                         <table width="100%" class="table table-striped">
                             <thead>
@@ -83,7 +93,7 @@
                                         align="left"
                                         style="font-family: 'Helvetica';font-size: 18px;"
                                     >
-                                        <b>Student Name</b>
+                                        <b>Fees Structure</b>
                                     </td>
                                     <td
                                         align="right"
@@ -96,8 +106,7 @@
                             </thead>
                             <tbody>
                                 <t t-set="counter" t-value="0" />
-                                <t t-set="total" t-value="0" />
-                                <t t-foreach="payslip" t-as="l">
+                                <t t-foreach="o.line_ids" t-as="l">
                                     <t t-set="counter" t-value="counter+1" />
                                     <tr>
                                         <td>
@@ -114,61 +123,58 @@
                                             align="left"
                                             style="font-family: 'Helvetica';font-size: 16px;"
                                         >
-                                            <span t-field="l.student_id.name" />
+                                            <span t-field="l.name" />
                                         </td>
                                         <td
                                             align="right"
                                             width="45%"
                                             style="font-family: 'Helvetica';font-size: 16px;"
                                         >
-                                            <span t-esc="l.total" />
-                                            <t
-                                                t-set="total"
-                                                t-value="total + l.total"
+                                            <span
+                                                t-field="l.amount"
+                                                t-options='{"widget": "monetary","display_currency": l.company_id.currency_id}'
                                             />
                                         </td>
                                     </tr>
                                 </t>
                             </tbody>
                         </table>
-                        <table width="100%">
-                            <tr>
-                                <td width="5%" />
-                                <td
-                                    width="50%"
-                                    align="left"
-                                    style="font-family: 'Helvetica';font-size: 16px;"
-                                >
-                                    <b>Total Fees</b>
-                                </td>
-                                <td
-                                    align="right"
-                                    width="45%"
-                                    style="font-family: 'Helvetica';font-size: 16px;"
-                                >
-                                    <b t-esc="total" />
-                                </td>
-                            </tr>
-                        </table>
-                        <table width="100%">
-                            <tr>
-                                <td
-                                    width="50%"
-                                    style="font-family: 'Helvetica';font-size: 16px;"
-                                >
-                                    <br />
-                                    <br />
-                                    <br />
-                                    <br />
-                                    <b>Principal</b>
-                                    <br />
-                                    <span>Authorized Signature</span>
-                                </td>
-                                <td width="50%">
-                                    <br />
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="row">
+                            <div class="col-xs-4 pull-right">
+                                <table class="table table-condensed">
+                                    <tr>
+                                        <td><strong>Total Fees</strong></td>
+                                        <td class="text-right">
+                                            <span
+                                                t-field="o.total"
+                                                t-options='{"widget": "monetary","display_currency": o.currency_id}'
+                                            />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Amount Paid</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.paid_amount" />
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black">
+                                        <td><strong>Due Amount</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.due_amount" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 pull-right">
+                            <br /><br /><br /><br /><br /><br /><br />
+                            <b>Principal,</b>
+                            <br /><br /><br />
+                            <span
+                                style="font-family: 'Helvetica';font-size: 16px;"
+                            >Authorized Signature</span>
+                            <br />
+                       </div>
                     </div>
                 </t>
             </t>
