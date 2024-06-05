@@ -12,7 +12,7 @@
                             <field
                                 name="academic_year_id"
                                 required="1"
-                                options="{&quot;no_create&quot;: True, &quot;no_search&quot;: True, &quot;no_open&quot;: True}"
+                                options="{&quot;no_create&quot;: True, &quot;no_open&quot;: True}"
                             />
                             <field name="month" required="1" />
                             <field name="month_str" required="1" invisible="1" />
@@ -21,7 +21,7 @@
                             <field
                                 name="course_id"
                                 required="1"
-                                options="{&quot;no_create&quot;: True, &quot;no_search&quot;: True, &quot;no_open&quot;: True}"
+                                options="{&quot;no_create&quot;: True, &quot;no_open&quot;: True}"
                             />
                             <field name="is_elective_subject" />
                             <field
@@ -29,7 +29,6 @@
                                 attrs="{'invisible':[('is_elective_subject','=', False)], 'required':[('is_elective_subject','!=', False)]}"
                                 options="{&quot;no_create&quot;: True}"
                                 domain="[('is_elective_subject', '=', True)]"
-                            />
                             />
                         </group>
                     </group>

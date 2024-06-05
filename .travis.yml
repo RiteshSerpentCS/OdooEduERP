@@ -12,7 +12,7 @@ addons:
   apt:
     packages:
       - expect-dev # provides unbuffer utility
-      - python-lxml  # because pip installation is slow
+      - python-lxml # because pip installation is slow
       - python-simplejson
       - python-serial
       - python-yaml
@@ -39,7 +39,8 @@ jobs:
 
 env:
   global:
-    - VERSION="saas-13.5" TESTS="0" LINT_CHECK="0" TRANSIFEX="0" WKHTMLTOPDF_VERSION="0.12.5"
+    - VERSION="saas-13.5" TESTS="0" LINT_CHECK="0" TRANSIFEX="0"
+      WKHTMLTOPDF_VERSION="0.12.5"
     - TRANSIFEX_USER='transbot@odoo-community.org'
 
 install:

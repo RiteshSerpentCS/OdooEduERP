@@ -226,6 +226,22 @@ class SchoolEvaluationTemplate(models.Model):
         "rating.rating", "template_id", "Rating", help="Rating"
     )
 
+    @api.constrains("rating_line")
+    def _check_rating(self):
+        for record in self:
+            ratings = record.rating_line.mapped("rating")
+            for rating in ratings:
+                duplicate = self.env["rating.rating"].search(
+                    [
+                        ("rating", "=", rating),
+                        ("template_id", "!=", record.id),  # Exclude current record
+                    ]
+                )
+                if duplicate:
+                    raise ValidationError(
+                        _("Rating %s already exists in another record") % rating
+                    )
+
 
 class RatingRating(models.Model):
     """Defining Rating."""

@@ -449,6 +449,10 @@ class StudentStudent(models.Model):
         """Set the state to cancel."""
         self.state = "cancel"
 
+    def reset_to_draft(self):
+        """Set the state to cancel."""
+        self.state = "draft"
+
     def admission_done(self):
         """Method to confirm admission"""
         school_standard_obj = self.env["school.standard"]

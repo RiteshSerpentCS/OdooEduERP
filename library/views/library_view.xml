@@ -197,14 +197,13 @@
                             <field
                                 name="categ_id"
                                 placeholder="Select or Create Book"
-                                options="{&quot;no_create&quot;: True, &quot;no_search&quot;: True}"
+                                options="{&quot;no_create&quot;: True,}"
                                 domain="[('book_categ','=',True)]"
                             />
                             <field
                                 name="author"
-                                string="Author"
                                 placeholder="Name of Author"
-                                options="{&quot;no_create&quot;: True, &quot;no_search&quot;: True}"
+                                options="{&quot;no_create&quot;: True,}"
                             />
                             <field name="type" invisible="1" />
                         </group>
@@ -228,12 +227,15 @@
                                 <field name="creation_date" />
                                 <field name="tome" />
                                 <field name="format" placeholder="Format of Book" />
-                                <field name="weight" />
+                                <field
+                                    name="weight"
+                                    attrs="{'invisible':[('is_ebook', '=',True)]}"
+                                />
                                 <field
                                     name="rack"
-                                    string="Rack"
                                     placeholder="Position of book"
-                                    options="{&quot;no_create&quot;: True, &quot;no_search&quot;: True}"
+                                    options="{&quot;no_create&quot;: True,}"
+                                    attrs="{'invisible':[('is_ebook', '=',True)]}"
                                 />
                                 <field name="back" />
                                 <field
@@ -247,7 +249,7 @@
                                 <field
                                     name="lang"
                                     placeholder="Language of Book"
-                                    options="{&quot;no_create&quot;: True, &quot;no_search&quot;: True}"
+                                    options="{&quot;no_create&quot;: True,}"
                                 />
                                 <field name="is_ebook" />
                                 <field
@@ -578,6 +580,7 @@
                 <field name="user" />
                 <field name="book_limit" />
                 <field name="card_name" />
+                <field name="state" />
             </tree>
         </field>
     </record>
@@ -775,10 +778,21 @@
                     <group
                         attrs="{'invisible':[('state','in',['draft','subscribe','pending'])], 'readonly' : [('state', 'in', ['reissue', 'return'])]}"
                     >
-                        <separator string="Issue Date" />
+                        <separator
+                            string="Issue Date"
+                            attrs="{'invisible':[('ebook_check','=',True)]}"
+                        />
                         <group>
-                            <field name="day_to_return_book" readonly="1" />
-                            <field name="date_return" readonly="1" />
+                            <field
+                                name="day_to_return_book"
+                                readonly="1"
+                                attrs="{'invisible':[('ebook_check','=',True)]}"
+                            />
+                            <field
+                                name="date_return"
+                                readonly="1"
+                                attrs="{'invisible':[('ebook_check','=',True)]}"
+                            />
                             <field
                                 name="penalty"
                                 attrs="{'invisible':['|',('state','not in',['return','fine','paid']),('penalty','&lt;',1.0)]}"
@@ -789,11 +803,14 @@
                             />
                         </group>
                         <group>
-                            <field name="date_issue" readonly="1" />
+                            <field
+                                name="date_issue"
+                                readonly="1"
+                                attrs="{'invisible':[('ebook_check','=',True)]}"
+                            />
                             <field
                                 name="actual_return_date"
-                                string="Actual Return Date"
-                                attrs="{'readonly':[('state','not in',('issue','reissue'))]}"
+                                attrs="{'readonly':[('state','not in',('issue','reissue'))],'invisible':[('ebook_check','=',True)]}"
                                 readonly="1"
                             />
                         </group>

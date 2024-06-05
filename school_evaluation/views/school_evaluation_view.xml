@@ -59,6 +59,7 @@
                 <field name="type" />
                 <field name="date" />
                 <field name="total" />
+                <field name="state" />
             </tree>
         </field>
     </record>

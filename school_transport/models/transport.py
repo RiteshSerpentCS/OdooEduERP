@@ -97,8 +97,8 @@ class ResPartner(models.Model):
         if driver_rec:
             raise ValidationError(
                 _(
-                    """The licence number you have entered already exist.
-Please enter different licence number!"""
+                    """ The licence number you have entered already exist.
+                Please enter different licence number!"""
                 )
             )
 
@@ -271,7 +271,16 @@ class StudentTransports(models.Model):
     def check_dates(self):
         """Constraint ot check start/end date and duration"""
         for rec in self:
+            new_dt = fields.Date.context_today(self)
             delta = rec.end_date - rec.start_date
+            if rec.start_date < new_dt or rec.end_date < new_dt:
+                raise ValidationError(
+                    _(
+                        "Start date or End date should be greater than \
+                        or equal to the current date!"
+                    )
+                )
+
             if rec.start_date > rec.end_date:
                 raise ValidationError(_("Start date should be less than end date!"))
             if delta.days < 30:
@@ -382,6 +391,7 @@ class TransportRegistration(models.Model):
     )
     monthly_amount = fields.Float(help="Enter monthly amount")
     paid_amount = fields.Float(help="Amount Paid")
+    tax_amount = fields.Float("Taxable Amount", help="Tax Amount")
     remain_amt = fields.Float("Due Amount", help="Amount Remaining")
     transport_fees = fields.Float(
         compute="_compute_transport_fees",
@@ -396,6 +406,19 @@ class TransportRegistration(models.Model):
         string="Transport user",
         help="Activate/Deactivate as following user is transport user or not",
     )
+
+    @api.constrains("student_id", "reg_date")
+    def check_student_route(self):
+        record = self.search(
+            [
+                ("id", "!=", self.id),
+                ("student_id", "=", self.student_id.id),
+                ("reg_date", "=", self.reg_date),
+                ("state", "not in", ["paid", "cancel"]),
+            ]
+        )
+        if record:
+            raise ValidationError(_("Student already has different route"))
 
     @api.onchange("name")
     def onchange_name(self):
@@ -607,6 +630,7 @@ class AccountPaymentRegister(models.TransientModel):
                         "state": "paid",
                         "paid_amount": fees_payment,
                         "remain_amt": 0.0,
+                        "tax_amount": invoice.amount_tax,
                     }
                 )
             elif invoice.transport_student_id and invoice.payment_state == "not_paid":
@@ -615,6 +639,7 @@ class AccountPaymentRegister(models.TransientModel):
                     {
                         "state": "pending",
                         "paid_amount": fees_payment,
+                        "tax_amount": invoice.amount_tax,
                         "remain_amt": invoice.amount_residual,
                     }
                 )
