@@ -615,41 +615,16 @@
                             </field>
                         </page>
                         <page string="Remarks">
-                            <field
-                                name="description"
-                                nolabel="1"
-                                colspan="4"
-                                string="Description"
-                                attrs="{'readonly':[('state','in',['alumni','terminate'])]}"
-                            >
-                                <form string="Extra Details">
-                                    <group col="4" colspan="2">
-                                        <field
-                                            name="name"
-                                            placeholder="Field Name"
-                                            string="Name"
-                                        />
-                                        <field
-                                            name="description"
-                                            placeholder="Description"
-                                            string="Description"
-                                        />
-                                    </group>
-                                </form>
-                                <tree editable="top">
-                                    <field
-                                        name="name"
-                                        string="Name"
-                                        required="1"
-                                        placeholder="Enter Name"
-                                    />
-                                    <field
-                                        name="description"
-                                        placeholder="Enter Description"
-                                        string="Description"
-                                    />
-                                </tree>
-                            </field>
+                            <form string="Remarks">
+                                <field
+                                    name="remark"
+                                    placeholder="Remark"
+                                    string="Remark"
+                                    nolabel="1"
+                                    colspan="4"
+                                    attrs="{'readonly':[('state','=','alumni')]}"
+                                />
+                            </form>
                         </page>
                         <page
                             string="History"
@@ -973,6 +948,15 @@
                         type="object"
                         string="Cancel"
                         states="draft"
+                        groups="school.group_school_administration"
+                    />
+                    <button
+                        class="oe_stat_button"
+                        icon="fa-ban"
+                        name="reset_to_draft"
+                        type="object"
+                        states="cancel"
+                        string="Reset to draft"
                         groups="school.group_school_administration"
                     />
                     <field

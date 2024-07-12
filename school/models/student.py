@@ -462,7 +462,7 @@ class StudentStudent(models.Model):
         for rec in self:
             if not rec.standard_id:
                 raise ValidationError(_("Please select class!"))
-            if rec.standard_id.remaining_seats <= 0:
+            if rec.standard_id.remaining_seats < 0:
                 raise ValidationError(
                     _("Seats of class %s are full") % rec.standard_id.standard_id.name
                 )
