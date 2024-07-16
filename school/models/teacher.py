@@ -147,6 +147,10 @@ class SchoolTeacher(models.Model):
             parent_grp_id = self.env.ref("school.group_school_parent")
             if parent_grp_id in user_rec.groups_id:
                 user_rec.write({"groups_id": [(3, parent_grp_id.id)]})
+        if vals.get("name"):
+            user_obj = self.employee_id.user_id
+            user_vals = {"name": vals.get("name")}
+            user_rec = user_obj.write(user_vals)
         return super(SchoolTeacher, self).write(vals)
 
     @api.onchange("address_id")

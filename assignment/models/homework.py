@@ -54,12 +54,14 @@ class SchoolTeacherAssignment(models.Model):
     @api.constrains("assign_date", "due_date")
     def check_date(self):
         """Method to check constraint of due date and assign date"""
+        date = fields.Date.today()
+        if self.assign_date < date:
+            raise ValidationError(
+                _("""Assign date should be Greater than or equal to current date""")
+            )
         if self.due_date < self.assign_date:
             raise ValidationError(
-                _(
-                    """
-Due date of homework should be greater than assign date"""
-                )
+                _("""Due date of homework should be greater than assign date""")
             )
 
     def active_assignment(self):
@@ -107,6 +109,9 @@ Due date of homework should be greater than assign date"""
 
     def done_assignments(self):
         """Changes the state to done"""
+        states = self.student_assign_ids.mapped("state")
+        if not all(state == "done" for state in states):
+            raise ValidationError(_("You cannot confirm the assignment"))
         self.state = "done"
 
     def unlink(self):

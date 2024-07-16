@@ -55,6 +55,22 @@ class TimeTable(models.Model):
         help="Class room in which tome table would be followed",
     )
 
+    @api.constrains("year_id", "standard_id")
+    def _check_timetable(self):
+        for record in self:
+            if record.year_id and record.standard_id:
+                existing_records = self.search(
+                    [
+                        ("year_id", "=", record.year_id.id),
+                        ("standard_id", "=", record.standard_id.id),
+                        ("id", "!=", record.id),  # Exclude the current record
+                    ]
+                )
+                if existing_records:
+                    raise ValidationError(
+                        _("A record with the same Year and Standard already exists.")
+                    )
+
     @api.constrains("timetable_ids")
     def _check_lecture(self):
         """Method to check same lecture is not assigned on same day."""
@@ -114,7 +130,9 @@ class TimeTableLine(models.Model):
                 )
 
     teacher_id = fields.Many2one(
-        "school.teacher", "Faculty Name", help="Select Teacher"
+        "school.teacher",
+        "Faculty Name",
+        help="Select Teacher",
     )
     subject_id = fields.Many2one(
         "subject.subject", "Subject Name", help="Select Subject"

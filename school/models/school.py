@@ -227,7 +227,8 @@ class StandardStandard(models.Model):
     @api.model
     def next_standard(self, sequence):
         """This method check sequence of standard"""
-        self.search([("sequence", ">", sequence)], order="id", limit=1)
+        standard_rec = self.search([("sequence", ">", sequence)], order="id", limit=1)
+        return standard_rec
 
     @api.constrains("name", "sequence")
     def _check_standard_name(self):
@@ -865,11 +866,13 @@ class StudentPreviousSchool(models.Model):
                     "current date!"
                 )
             )
-        if (self.admission_date and self.exit_date) and (
-            self.admission_date > self.exit_date
+        if (
+            self.admission_date
+            and self.exit_date
+            and self.exit_date < self.admission_date
         ):
             raise ValidationError(
-                _("Admission date should be less than exit date in previous" " school!")
+                _("Admission date should be less than exit date in previous school!")
             )
 
 
@@ -1139,7 +1142,7 @@ class StudentReminder(models.Model):
     date = fields.Date(help="Reminder date")
     description = fields.Text(help="Description of the reminder")
     color = fields.Integer("Color Index", default=0, help="Color index")
-    active = fields.Boolean(string="Active")
+    active = fields.Boolean(default="True")
 
     @api.constrains("date")
     def check_date(self):

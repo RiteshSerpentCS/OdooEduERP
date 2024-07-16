@@ -120,6 +120,14 @@ class LibraryCard(models.Model):
         if self.duration and self.duration < 0:
             raise UserError(_("Duration(months) should not be negative value!"))
 
+    @api.constrains("start_date")
+    def check_start_date(self):
+        new_dt = fields.Date.today()
+        if self.start_date and self.start_date < new_dt:
+            raise UserError(
+                _("Your Start date should be Greater than " "current date!")
+            )
+
     @api.onchange("student_id")
     def on_change_student(self):
         """
@@ -791,6 +799,12 @@ class LibraryBookRequest(models.Model):
                     "same time!"
                 )
             )
+
+    @api.constrains("card_id")
+    def check_start_date(self):
+        date = fields.Date.today()
+        if self.card_id.start_date > date:
+            raise UserError(_("You can't request book!"))
 
     @api.model
     def create(self, vals):

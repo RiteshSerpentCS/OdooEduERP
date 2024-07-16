@@ -736,7 +736,7 @@ class AdditionalExamResult(models.Model):
         """Method to compute result of student"""
         for rec in self:
             if rec.a_exam_id and rec.a_exam_id:
-                if rec.a_exam_id.minimum_marks < rec.obtain_marks:
+                if rec.a_exam_id.minimum_marks <= rec.obtain_marks:
                     rec.result = "Pass"
                 else:
                     rec.result = "Fail"

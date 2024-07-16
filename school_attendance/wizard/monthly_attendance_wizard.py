@@ -31,8 +31,14 @@ class DailyAttendanceStudentRemark(models.TransientModel):
         string="Academic Session",
         default=lambda obj: obj.env["academic.year"].search([("current", "=", True)]),
     )
-    course_id = fields.Many2one("school.standard", string="Class", ondelete="restrict")
+    course_id = fields.Many2one(
+        "school.standard",
+        string="Class",
+        ondelete="restrict",
+    )
+    user = fields.Char(default=lambda self: self.env.user)
     user_id = fields.Many2one("school.teacher", string="Teacher")
+    standard_name = fields.Char(related="course_id.standard_id.name", store=True)
     month = fields.Selection(
         selection=[
             ("1", "January"),

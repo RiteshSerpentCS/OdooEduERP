@@ -49,6 +49,17 @@ class HostelType(models.Model):
     student_ids = fields.One2many(
         "hostel.student", "hostel_info_id", string="Students", help="Enter students"
     )
+    company_id = fields.Many2one(
+        "res.company",
+        string="Company",
+    )
+    street = fields.Char()
+    street2 = fields.Char()
+    zip = fields.Char()
+    city = fields.Char()
+    state_id = fields.Many2one("res.country.state", string="State", ondelete="restrict")
+    country_id = fields.Many2one("res.country", string="Country", ondelete="restrict")
+    currency_id = fields.Many2one(related="company_id.currency_id", readonly=True)
 
     @api.model
     def _search(
@@ -132,7 +143,11 @@ class HostelRoom(models.Model):
     )
 
     _sql_constraints = [
-        ("room_no_unique", "unique(room_no)", "Room number must be unique!"),
+        (
+            "room_no_unique_per_hostel",
+            "unique(room_no, name)",
+            "Room number must be unique!",
+        ),
         (
             "floor_per_hostel",
             "check(floor_no < 99)",
@@ -163,7 +178,9 @@ class HostelStudent(models.Model):
     def _compute_remaining_fee_amt(self):
         """Method to compute hostel amount"""
         for rec in self:
-            rec.remaining_amount = rec.room_rent - (rec.paid_amount or 0.0)
+            rec.remaining_amount = (
+                rec.room_rent + rec.tax_amount - (rec.paid_amount or 0.0)
+            )
 
     def _compute_invoices(self):
         """Method to compute number of invoice of student"""
@@ -208,14 +225,17 @@ class HostelStudent(models.Model):
         help="Date of admission in hostel",
         default=fields.Datetime.now,
     )
-    discharge_date = fields.Datetime(help="Date on which student discharge")
+    discharge_date = fields.Datetime(
+        "Checkout Date", help="Date on which student Checkout"
+    )
+    tax_amount = fields.Float("Taxable Amount", help="Tax Amount")
     paid_amount = fields.Float(help="Amount Paid")
     hostel_info_id = fields.Many2one("hostel.type", "Hostel", help="Select hostel type")
     room_id = fields.Many2one("hostel.room", "Room", help="Select hostel room")
     duration = fields.Integer(help="Enter duration of living")
     rent_pay = fields.Float("Rent", help="Enter rent pay of the hostel")
     acutal_discharge_date = fields.Datetime(
-        "Actual Discharge Date", help="Date on which student discharge"
+        "Actual Checkout Date", help="Date on which student Checkout"
     )
     remaining_amount = fields.Float(compute="_compute_remaining_fee_amt")
     status = fields.Selection(
@@ -242,6 +262,15 @@ class HostelStudent(models.Model):
             "Error ! Discharge Date cannot be set" "before Admission Date!",
         )
     ]
+
+    @api.constrains("admission_date")
+    def check_admission_date(self):
+        new_dt = fields.Date.context_today(self)
+        admission_dt_date = self.admission_date.date()
+        if admission_dt_date and admission_dt_date < new_dt:
+            raise ValidationError(
+                _("Your Check-in date should be Greater than current date!")
+            )
 
     @api.constrains("duration")
     def check_duration(self):
@@ -426,6 +455,7 @@ class HostelAmenities(models.Model):
 
     name = fields.Char(help="Provided Hostel Amenity", required=True)
     active = fields.Boolean(
+        default="True",
         help="Activate/Deactivate whether the amenity should be given or not",
     )
 
@@ -458,7 +488,13 @@ class AccountPaymentRegister(models.TransientModel):
             vals = {}
             if inv.hostel_student_id and inv.payment_state == "paid":
                 fees_payment = inv.hostel_student_id.paid_amount + rec.amount
-                vals.update({"status": "paid", "paid_amount": fees_payment})
+                vals.update(
+                    {
+                        "status": "paid",
+                        "paid_amount": fees_payment,
+                        "tax_amount": inv.amount_tax,
+                    }
+                )
                 inv.hostel_student_id.write(vals)
             elif inv.hostel_student_id and inv.payment_state == "not_paid":
                 fees_payment = inv.hostel_student_id.paid_amount + rec.amount
@@ -467,6 +503,7 @@ class AccountPaymentRegister(models.TransientModel):
                         "status": "pending",
                         "paid_amount": fees_payment,
                         "remaining_amount": inv.amount_residual,
+                        "tax_amount": inv.amount_tax,
                     }
                 )
             inv.hostel_student_id.write(vals)

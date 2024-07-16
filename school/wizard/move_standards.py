@@ -25,6 +25,7 @@ The Acedemic year from which you need to move the student to next Year.""",
         standard_obj = self.env["standard.standard"]
         student_obj = self.env["student.student"]
         next_year_id = academic_obj.next_year(self.academic_year_id.sequence)
+
         if not next_year_id:
             raise ValidationError(
                 _(
@@ -43,7 +44,7 @@ The Acedemic year from which you need to move the student to next Year.""",
                 division = stud.standard_id.division_id.id or False
                 next_stand = school_stand_obj.search(
                     [
-                        ("standard_id", "=", next_class_id),
+                        ("standard_id", "=", next_class_id.id),
                         ("division_id", "=", division),
                         ("school_id", "=", stud.school_id.id),
                         ("medium_id", "=", stud.medium_id.id),
@@ -51,7 +52,7 @@ The Acedemic year from which you need to move the student to next Year.""",
                 )
                 if next_stand:
                     std_vals = {
-                        "year": next_year_id.id,
+                        "year": next_year_id,
                         "standard_id": next_stand.id,
                     }
                     # Move student to next standard
