@@ -276,7 +276,8 @@ class StudentTransports(models.Model):
             if rec.start_date < new_dt or rec.end_date < new_dt:
                 raise ValidationError(
                     _(
-                        "Start date or End date should be greater than or equal to the current date!"
+                        "Start date or End date should be greater"
+                        " than or equal to the current date!"
                     )
                 )
 

@@ -206,6 +206,7 @@
                                 options="{&quot;no_create&quot;: True,}"
                             />
                             <field name="type" invisible="1" />
+                            <field name="detailed_type" invisible='1' />
                         </group>
                     </group>
                     <notebook>
