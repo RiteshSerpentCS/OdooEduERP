@@ -904,8 +904,9 @@ class StudentFamilyContact(models.Model):
         for rec in self:
             relative_name = rec.name
             if rec.stu_name:
-                rec.relative_name = rec.stu_name.name
+                relative_name = rec.stu_name.name
             rec.relative_name = relative_name
+            rec.name = relative_name
 
     family_contact_id = fields.Many2one(
         "student.student", "Student Ref.", help="Enter related student"
@@ -930,7 +931,13 @@ class StudentFamilyContact(models.Model):
         "Existing Student",
         help="Select Student From Existing List",
     )
-    name = fields.Char(string="Relative Name", help="Enter relative name")
+    name = fields.Char(
+        compute="_compute_get_name",
+        store=True,
+        readonly=False,
+        string="Relative Name",
+        help="Enter relative name",
+    )
     relation = fields.Many2one(
         "student.relation.master",
         required=True,

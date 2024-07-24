@@ -63,6 +63,7 @@ class TimeTable(models.Model):
                     [
                         ("year_id", "=", record.year_id.id),
                         ("standard_id", "=", record.standard_id.id),
+                        ("timetable_type", "=", record.timetable_type),
                         ("id", "!=", record.id),  # Exclude the current record
                     ]
                 )

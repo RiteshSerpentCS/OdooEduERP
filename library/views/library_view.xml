@@ -206,6 +206,7 @@
                                 options="{&quot;no_create&quot;: True,}"
                             />
                             <field name="type" invisible="1" />
+                            <field name="detailed_type" invisible='1' />
                         </group>
                     </group>
                     <notebook>
@@ -817,7 +818,7 @@
                     </group>
                     <group
                         string="E Book Details"
-                        attrs="{'invisible':[('state','in',['issue','ressiue','cancel','return','lost','fine','draft'])],'readonly':[('state','in',('done'))]}"
+                        attrs="{'invisible':[('state','in',['issue','reissue','cancel','return','lost','fine','draft'])],'readonly':[('state','in',('done'))]}"
                     >
                         <field
                             name="subscription_amt"

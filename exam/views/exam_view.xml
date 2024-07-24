@@ -159,6 +159,7 @@
                                 attrs="{'readonly': [('state','!=','draft')]}"
                                 placeholder="Start Date"
                                 required="1"
+                                widget="datepicker"
                             />
                         </group>
                         <group col="2">

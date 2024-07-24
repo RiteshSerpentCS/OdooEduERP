@@ -455,7 +455,7 @@
                                             <field
                                                 name="stu_name"
                                                 placeholder="Create or Select Name"
-                                                attrs="{'invisible':[('rel_name','!=','exist')]}"
+                                                attrs="{'invisible':[('rel_name','=','new')]}"
                                                 options="{&quot;no_create&quot;: True}"
                                             />
                                             <field
@@ -483,7 +483,7 @@
                                     </group>
                                 </form>
                                 <tree>
-                                    <field name="relative_name" />
+                                    <field name="name" />
                                     <field name="relation" />
                                     <field name="phone" />
                                 </tree>

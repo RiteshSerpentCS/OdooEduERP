@@ -1,5 +1,7 @@
 # See LICENSE file for full copyright and licensing details.
 
+from datetime import date
+
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -293,6 +295,18 @@ class ExamExam(models.Model):
         "Exam Schedule",
         help="Enter exam schedule",
     )
+
+    @api.constrains("end_date")
+    def _check_end_date(self):
+        for record in self:
+            if record.end_date < date.today():
+                raise ValidationError(_("Exam End Date cannot be in the past."))
+
+    @api.constrains("start_date")
+    def _check_start_date(self):
+        for record in self:
+            if record.start_date < date.today():
+                raise ValidationError(_("Exam Start Date cannot be in the past."))
 
     @api.model
     def create(self, vals):
