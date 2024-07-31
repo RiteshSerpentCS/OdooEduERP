@@ -18,6 +18,9 @@
         "school_transport",
         "timetable",
     ],
+    "images": [
+         "static/description/eduERP-16.png"
+     ],
     "license": "AGPL-3",
     "auto_install": False,
     "installable": True,
