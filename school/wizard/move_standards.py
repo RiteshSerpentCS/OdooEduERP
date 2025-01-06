@@ -24,6 +24,7 @@ The Acedemic year from which you need to move the student to next Year.""",
         school_stand_obj = self.env["school.standard"]
         standard_obj = self.env["standard.standard"]
         student_obj = self.env["student.student"]
+        history_obj = self.env["student.history"]
         next_year_id = academic_obj.next_year(self.academic_year_id.sequence)
 
         if not next_year_id:
@@ -39,7 +40,7 @@ The Acedemic year from which you need to move the student to next Year.""",
         for stud in done_rec:
             standard_seq = stud.standard_id.standard_id.sequence
             next_class_id = standard_obj.next_standard(standard_seq)
-            # Assign the academic year
+            same_class_id = standard_obj.same_standard(standard_seq)
             if next_class_id:
                 division = stud.standard_id.division_id.id or False
                 next_stand = school_stand_obj.search(
@@ -51,9 +52,18 @@ The Acedemic year from which you need to move the student to next Year.""",
                     ]
                 )
                 if next_stand:
-                    std_vals = {
-                        "year": next_year_id,
-                        "standard_id": next_stand.id,
+                    # std_vals = {
+                    #     "year": next_year_id,
+                    #     "standard_id": next_stand.id,
+                    # }
+                    # # Move student to next standard
+                    # stud.write(std_vals)
+                    history_vals = {
+                        "move_date": fields.Date.today(),
+                        "student_id": stud.id,
+                        "academice_year_id": self.academic_year_id.id,
+                        "standard_id": same_class_id.id,
                     }
-                    # Move student to next standard
-                    stud.write(std_vals)
+                    history_obj.create(history_vals)
+
+        return stud
