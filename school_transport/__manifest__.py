@@ -2,14 +2,14 @@
 
 {
     "name": "Transport Management for Education ERP",
-    "version": "16.0.1.0.0",
+    "version": "17.0.1.0.0",
     "author": "Serpent Consulting Services Pvt. Ltd.",
     "website": "http://www.serpentcs.com",
     "license": "AGPL-3",
     "category": "School Management",
     "complexity": "easy",
     "summary": "A Module For Transport & Vehicle Management In School",
-    "depends": ["school", "fleet"],
+    "depends": ["school", "fleet", "school_hostel"],
     "images": ["static/description/SchoolTransport.png"],
     "data": [
         "security/transport_security.xml",
