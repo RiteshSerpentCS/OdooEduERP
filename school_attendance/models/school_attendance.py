@@ -9,7 +9,7 @@ from lxml import etree
 from num2words import num2words
 
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError, Warning as UserError
+from odoo.exceptions import ValidationError
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 
 
@@ -63,7 +63,7 @@ class AttendanceSheet(models.Model):
     def fields_view_get(
         self, view_id=None, view_type="form", toolbar=False, submenu=False
     ):
-        res = super(AttendanceSheet, self).fields_view_get(
+        res = super().fields_view_get(
             view_id=view_id,
             view_type=view_type,
             toolbar=toolbar,
@@ -156,12 +156,12 @@ class StudentleaveRequest(models.Model):
     def create(self, vals):
         if vals.get("student_id"):
             vals.update(self._update_vals(vals.get("student_id")))
-        return super(StudentleaveRequest, self).create(vals)
+        return super().create(vals)
 
     def write(self, vals):
         if vals.get("student_id"):
             vals.update(self._update_vals(vals.get("student_id")))
-        return super(StudentleaveRequest, self).write(vals)
+        return super().write(vals)
 
     def unlink(self):
         """Inherited unlink method to give warning on record deletion"""
@@ -171,7 +171,7 @@ class StudentleaveRequest(models.Model):
                     raise ValidationError(_("""Approve leave can not be deleted!"""))
                 else:
                     raise ValidationError(_("""Reject leave can not be deleted!"""))
-        return super(StudentleaveRequest, self).unlink()
+        return super().unlink()
 
     @api.onchange("student_id")
     def onchange_student(self):
@@ -183,7 +183,9 @@ class StudentleaveRequest(models.Model):
 
     def approve_state(self):
         """Change state to approve."""
-        self.state = "approve"
+        leaves = self.filtered(lambda leave: leave.state == "toapprove")
+        if leaves:
+            self.state = "approve"
 
     def draft_state(self):
         """Change state to draft."""
@@ -191,7 +193,9 @@ class StudentleaveRequest(models.Model):
 
     def toapprove_state(self):
         """Change state to toapprove."""
-        self.state = "toapprove"
+        leaves = self.filtered(lambda leave: leave.state == "draft")
+        if leaves:
+            self.state = "toapprove"
 
     def reject_state(self):
         """Change state to reject."""
@@ -556,7 +560,7 @@ class DailyAttendance(models.Model):
                     line_vals.update({"is_absent": True})
             student_list.append((0, 0, line_vals))
         vals.update({"student_ids": student_list})
-        return super(DailyAttendance, self).create(vals)
+        return super().create(vals)
 
     def attendance_draft(self):
         """Change the state of attendance to draft"""
@@ -566,7 +570,7 @@ class DailyAttendance(models.Model):
 
         for rec in self:
             if not rec.date:
-                raise UserError(_("Please enter todays date."))
+                raise ValidationError(_("Please enter todays date."))
             year_search_ids = academic_year_obj.search([("code", "=", rec.date.year)])
             month_search_ids = academic_month_obj.search(
                 [("code", "=", rec.date.month)]
