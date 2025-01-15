@@ -6,6 +6,7 @@
     "author": "Serpent Consulting Services Pvt. Ltd.",
     "category": "EduERP Management",
     "website": "http://www.serpentcs.com",
+    "images": ["static/description/Banner_eduerp_base_17.jpg"],
     "depends": [
         "assignment",
         "exam",
