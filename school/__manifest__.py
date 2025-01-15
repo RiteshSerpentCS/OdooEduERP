@@ -9,7 +9,7 @@
     "license": "AGPL-3",
     "complexity": "easy",
     "Summary": "A Module For School Management",
-    "images": ["static/description/EMS.jpg"],
+    "images": ["static/description/Banner_school_17.jpg"],
     "depends": ["hr", "crm", "account"],
     "data": [
         "security/school_security.xml",
