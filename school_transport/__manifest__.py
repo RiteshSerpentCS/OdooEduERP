@@ -10,7 +10,7 @@
     "complexity": "easy",
     "summary": "A Module For Transport & Vehicle Management In School",
     "depends": ["school", "fleet", "school_hostel"],
-    "images": ["static/description/SchoolTransport.png"],
+    "images": ["static/description/Banner_school_transport_17.png"],
     "data": [
         "security/transport_security.xml",
         "security/ir.model.access.csv",
