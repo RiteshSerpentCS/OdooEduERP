@@ -28,7 +28,7 @@
         ]
     },
     "demo": ["demo/library_demo.xml"],
-    "image": ["static/description/SchoolLibrary.png"],
+    "image": ["static/description/Banner_library_17.png"],
     "installable": True,
     "application": True,
 }
