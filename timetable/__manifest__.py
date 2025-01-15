@@ -10,7 +10,7 @@
     "category": "School Management",
     "complexity": "easy",
     "summary": "A Module For Timetable Management In School",
-    "images": ["static/description/SchoolTimetable.png"],
+    "images": ["static/description/Banner_timetable_17.png"],
     "depends": ["school"],
     "data": [
         "security/timetable_security.xml",
