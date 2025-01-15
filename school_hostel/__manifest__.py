@@ -10,7 +10,7 @@
     "complexity": "easy",
     "summary": "Module For HOSTEL Management In School",
     "depends": ["school"],
-    "images": ["static/description/SchoolHostel.png"],
+    "images": ["static/description/Banner_school_hostel_17.png"],
     "data": [
         "security/hostel_security.xml",
         "security/ir.model.access.csv",
