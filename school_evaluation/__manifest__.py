@@ -8,7 +8,7 @@
     "category": "School Management",
     "license": "AGPL-3",
     "summary": "A Module For Evaluation Management In School",
-    "images": ["static/description/Evaluation1.jpg"],
+    "images": ["static/description/Banner_school_evaluation_17.jpg"],
     "depends": ["school", "rating"],
     "data": [
         "security/evaluation_security.xml",
