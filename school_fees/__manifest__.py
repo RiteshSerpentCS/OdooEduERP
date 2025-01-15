@@ -10,7 +10,7 @@
     "complexity": "easy",
     "summary": "A Module For Fees Management In School",
     "depends": ["school"],
-    "images": ["static/description/SchoolFees.png"],
+    "images": ["static/description/Banner_school_fees_17.png"],
     "data": [
         "security/ir.model.access.csv",
         "security/security_fees.xml",
