@@ -9,7 +9,7 @@
     "category": "School Management",
     "summary": "A Module For Assignment Management In School",
     "complexity": "easy",
-    "images": ["static/description/Assignment_Management.png"],
+    "images": ["static/description/Banner_assignment_17.png"],
     "depends": ["school"],
     "data": [
         "security/assignment_security.xml",
