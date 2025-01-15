@@ -321,7 +321,7 @@
         <field name="name">teacher.evaluation.tree</field>
         <field name="model">school.evaluation</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree name="teacher_evaluation">
                 <field name="teacher_id" />
                 <field name="type" />
                 <field name="date" />

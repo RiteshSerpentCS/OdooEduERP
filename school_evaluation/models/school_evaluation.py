@@ -1,6 +1,5 @@
 # See LICENSE file for full copyright and licensing details.
 
-from lxml import etree
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
@@ -84,32 +83,25 @@ class SchoolEvaluation(models.Model):
         return res
 
     @api.model
-    def fields_view_get(
-        self, view_id=None, viewtype="form", toolbar=False, submenu=False
-    ):
-        """Inherited this method to hide the create,edit button from list"""
-        res = super().fields_view_get(
-            view_id=view_id,
-            view_type=viewtype,
-            toolbar=toolbar,
-            submenu=submenu,
-        )
+    def _get_view(self, view_id=None, view_type="form", **options):
+        arch, view = super()._get_view(view_id, view_type, **options)
+        arch = self.sudo().hide_create_write(arch, view_type=view_type)
+        return arch, view
+
+    def hide_create_write(self, view_node, view_type="form"):
+        doc = view_node
         teacher_group = self.env.user.has_group("school.group_school_teacher")
-        doc = etree.XML(res["arch"])
         if teacher_group:
-            if viewtype == "tree":
+            if view_type == "tree":
                 nodes = doc.xpath("//tree[@name='teacher_evaluation']")
                 for node in nodes:
                     node.set("create", "false")
                     node.set("edit", "false")
-                res["arch"] = etree.tostring(doc)
-            if viewtype == "form":
+            if view_type == "form":
                 nodes = doc.xpath("//form[@name='teacher_evaluation']")
                 for node in nodes:
                     node.set("create", "false")
                     node.set("edit", "false")
-                res["arch"] = etree.tostring(doc)
-        return res
 
     def get_record(self):
         """Method to get the evaluation questions"""
