@@ -1,16 +1,12 @@
 # See LICENSE file for full copyright and licensing details.
 
-import json
 import time
 from datetime import date, datetime
 
-from dateutil.relativedelta import relativedelta as rd
-from lxml import etree
 from num2words import num2words
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 
 
 class AttendanceSheet(models.Model):
@@ -58,82 +54,6 @@ class AttendanceSheet(models.Model):
                     )
                 ]
             rec.attendance_ids = stud_list
-
-    @api.model
-    def fields_view_get(
-        self, view_id=None, view_type="form", toolbar=False, submenu=False
-    ):
-        res = super().fields_view_get(
-            view_id=view_id,
-            view_type=view_type,
-            toolbar=toolbar,
-            submenu=submenu,
-        )
-        start = self._context.get("start_date")
-        end = self._context.get("end_date")
-        st_dates = end_dates = False
-        if start:
-            st_dates = datetime.strptime(start, DEFAULT_SERVER_DATE_FORMAT)
-        if end:
-            end_dates = datetime.strptime(end, DEFAULT_SERVER_DATE_FORMAT)
-        if view_type == "form":
-            digits_temp_dict = {
-                1: "one",
-                2: "two",
-                3: "three",
-                4: "four",
-                5: "five",
-                6: "six",
-                7: "seven",
-                8: "eight",
-                9: "nine",
-                10: "ten",
-                11: "eleven",
-                12: "twelve",
-                13: "thirteen",
-                14: "fourteen",
-                15: "fifteen",
-                16: "sixteen",
-                17: "seventeen",
-                18: "eighteen",
-                19: "nineteen",
-                20: "twenty",
-                21: "twentyone",
-                22: "twentytwo",
-                23: "twentythree",
-                24: "twentyfour",
-                25: "twentyfive",
-                26: "twentysix",
-                27: "twentyseven",
-                28: "twentyeight",
-                29: "twentynine",
-                30: "thirty",
-                31: "thirtyone",
-            }
-            flag = 1
-            if st_dates and end_dates:
-                while st_dates <= end_dates:
-                    res["fields"]["attendance_ids"]["views"]["tree"]["fields"][
-                        digits_temp_dict.get(flag)
-                    ]["string"] = st_dates.day
-                    st_dates += rd(days=1)
-                    flag += 1
-            if flag < 32:
-                res["fields"]["attendance_ids"]["views"]["tree"]["fields"][
-                    digits_temp_dict.get(flag)
-                ]["string"] = ""
-                doc2 = etree.XML(
-                    res["fields"]["attendance_ids"]["views"]["tree"]["arch"]
-                )
-                nodes = doc2.xpath(
-                    "//field[@name='" + digits_temp_dict.get(flag) + "']"
-                )
-                for node in nodes:
-                    node.set("modifiers", json.dumps({"invisible": True}))
-                res["fields"]["attendance_ids"]["views"]["tree"][
-                    "arch"
-                ] = etree.tostring(doc2)
-        return res
 
 
 class StudentleaveRequest(models.Model):
